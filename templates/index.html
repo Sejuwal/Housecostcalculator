@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Cost Calculator</title>
+    <style>
+        body {
+            background-image: url('/static/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 50px;
+            box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.3);
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+        }
+        input, select {
+            background: rgba(255, 255, 255, 0.8);
+            color: black;
+        }
+        button {
+            background: #ff9800;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #e68900;
+            transform: scale(1.05);
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            text-shadow: 2px 2px 5px black;
+        }
+        .designer {
+            position: fixed;
+            bottom: 10px;
+            right: 20px;
+            font-size: 20px;
+            font-family: 'Cursive', sans-serif;
+            color: #ffeb3b;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.3);
+            animation: glow 2s infinite alternate;
+        }
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #ffeb3b;
+            }
+            to {
+                text-shadow: 0 0 20px #ffeb3b, 0 0 30px #ffeb3b;
+            }
+        }
+        .language-selector {
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        const locations = {
+            "Kathmandu": ["Kathmandu Metropolitan City", "Kageshwori Manohara", "Gokarneshwor", "Tokha", "Budhanilkantha", "Chandragiri", "Nagarjun", "Tarakeshwor", "Shankharapur"],
+            "Lalitpur": ["Lalitpur Metropolitan City", "Godawari", "Mahalaxmi", "Konjyosom", "Bagmati"],
+            "Bhaktapur": ["Bhaktapur Municipality", "Madhyapur Thimi", "Changunarayan", "Suryabinayak"]
+        };
+
+        const translations = {
+            "en": {
+                "title": "House Cost Calculator",
+                "land_area": "Land Area (in Aana):",
+                "location": "Location:",
+                "house_area": "House Area (in sqft):",
+                "floors": "Number of Floors:",
+                "calculate": "Calculate",
+                "designed_by": "Designed By: Sanjaya Sejuwal"
+            },
+            "ne": {
+                "title": "घर निर्माण लागत गणना",
+                "land_area": "जग्गाको क्षेत्रफल (आनामा):",
+                "location": "स्थान:",
+                "house_area": "घरको क्षेत्रफल (वर्ग फिटमा):",
+                "floors": "तलाको संख्या:",
+                "calculate": "गणना गर्नुहोस्",
+                "designed_by": "डिजाइन गरिएको: संजय सेजुवाल"
+            }
+        };
+
+        function populateLocations() {
+            const locationSelect = document.getElementById("location");
+            locationSelect.innerHTML = "";
+            for (let district in locations) {
+                locations[district].forEach(muni => {
+                    let option = document.createElement("option");
+                    option.value = muni;
+                    option.innerText = muni;
+                    locationSelect.appendChild(option);
+                });
+            }
+        }
+
+        function changeLanguage() {
+            let selectedLang = document.getElementById("language").value;
+            document.getElementById("title").innerText = translations[selectedLang]["title"];
+            document.getElementById("label_land").innerText = translations[selectedLang]["land_area"];
+            document.getElementById("label_location").innerText = translations[selectedLang]["location"];
+            document.getElementById("label_house").innerText = translations[selectedLang]["house_area"];
+            document.getElementById("label_floors").innerText = translations[selectedLang]["floors"];
+            document.getElementById("calculate_btn").innerText = translations[selectedLang]["calculate"];
+            document.getElementById("designer").innerText = translations[selectedLang]["designed_by"];
+        }
+    </script>
+</head>
+<body onload="populateLocations()">
+    <div class="container">
+        <h1 id="title">House Cost Calculator</h1>
+        <div class="language-selector">
+            <label for="language">Select Language:</label>
+            <select id="language" onchange="changeLanguage()">
+                <option value="en">English</option>
+                <option value="ne">नेपाली</option>
+            </select>
+        </div>
+        <label id="label_land">Land Area (in Aana):</label>
+        <input type="number" id="land_area"><br>
+        <label id="label_location">Location:</label>
+        <select id="location"></select><br>
+        <label id="label_house">House Area (in sqft):</label>
+        <input type="number" id="house_area"><br>
+        <label id="label_floors">Number of Floors:</label>
+        <input type="number" id="floors"><br>
+        <button id="calculate_btn" onclick="calculateCost()">Calculate</button>
+        <div id="result"></div>
+    </div>
+    <div id="designer" class="designer">Designed By: Sanjaya Sejuwal</div>
+<script>
+    function calculateCost() {
+        let landArea = document.getElementById("land_area").value;
+        let location = document.getElementById("location").value;
+        let houseArea = document.getElementById("house_area").value;
+        let floors = document.getElementById("floors").value;
+
+        if (!landArea || !location || !houseArea || !floors) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        let data = {
+            land_area: parseFloat(landArea),
+            location: location,
+            house_area: parseFloat(houseArea),
+            floors: parseInt(floors)
+        };
+
+        fetch("http://127.0.0.1:5000/calculate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.error) {
+                document.getElementById("result").innerHTML = `<span style="color: red;">Error: ${result.error}</span>`;
+            } else {
+                document.getElementById("result").innerHTML = `
+                    <strong>Land Cost:</strong> ${result.land_cost}<br>
+                    <strong>Construction Cost:</strong> ${result.construction_cost}<br>
+                    <strong>Total Cost:</strong> ${result.total_cost}
+                `;
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            document.getElementById("result").innerHTML = `<span style="color: red;">Failed to connect to server.</span>`;
+        });
+    }
+</script>
+
+</body>
+</html>
